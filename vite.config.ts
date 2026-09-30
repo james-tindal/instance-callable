@@ -8,6 +8,6 @@ export default defineConfig({
   lint,
   pack,
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['**/*.test.ts'],
   },
 })

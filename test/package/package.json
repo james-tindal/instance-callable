@@ -1,0 +1,8 @@
+{
+  "name": "extend-callable-package-test",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

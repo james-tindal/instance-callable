@@ -4,6 +4,7 @@ import perfectionist from 'eslint-plugin-perfectionist'
 
 export default {
   env: { builtin: true },
+  ignorePatterns: ['test/package/**'],
   jsPlugins: [
     { name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' },
     '@stylistic/eslint-plugin',
