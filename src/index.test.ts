@@ -41,12 +41,50 @@ class InitialisedCallable extends Callable<[suffix: string], string> {
   }
 }
 
+class MultipleArgumentsCallable extends Callable<[
+  first: number,
+  second: number,
+  third: number,
+], number> {
+  override call(_thisArgument: unknown, first: number, second: number, third: number) {
+    return first + second + third
+  }
+}
+
+class OptionalAndRestCallable extends Callable<[
+  required: string,
+  optional?: string,
+  ...rest: string[],
+], string> {
+  override call(
+    _thisArgument: unknown,
+    required: string,
+    optional?: string,
+    ...rest: string[]
+  ) {
+    return [required, optional, ...rest].filter(Boolean).join(':')
+  }
+}
+
+class OverriddenCounter extends Counter {
+  override call(_thisArgument: unknown, amount: number, multiplier = 1) {
+    this.value += amount * multiplier
+    return this.value
+  }
+}
+
 class ReceiverCallable extends Callable<[amount: number], number> {
   value = 0
 
   override call(thisArgument: this, amount: number) {
     thisArgument.value += amount
     return thisArgument.value
+  }
+}
+
+class ZeroArgumentsCallable extends Callable<[], string> {
+  override call() {
+    return 'zero'
   }
 }
 
@@ -145,6 +183,41 @@ describe('Callable', () => {
     expect(counter.length).toBe(1)
     expect(derivedCounter.name).toBe('DerivedCounter')
     expect(derivedCounter.length).toBe(1)
+  })
+
+  it('reports zero and multiple argument arity', () => {
+    expect(new ZeroArgumentsCallable().length).toBe(0)
+    expect(new MultipleArgumentsCallable().length).toBe(3)
+  })
+
+  it('uses inherited and overridden call implementations for metadata', () => {
+    expect(new DerivedCounter().length).toBe(1)
+    expect(new OverriddenCounter().length).toBe(1)
+    expect(new OverriddenCounter().name).toBe('OverriddenCounter')
+  })
+
+  it('uses JavaScript optional and rest parameter arity', () => {
+    const callable = new OptionalAndRestCallable()
+
+    expect(callable.length).toBe(2)
+    expect(callable('required', 'optional', 'rest')).toBe('required:optional:rest')
+  })
+
+  it('uses normal function descriptors for name and length', () => {
+    const callable = new Counter()
+
+    expect(Object.getOwnPropertyDescriptor(callable, 'name')).toEqual({
+      configurable: true,
+      enumerable: false,
+      value: 'Counter',
+      writable: false,
+    })
+    expect(Object.getOwnPropertyDescriptor(callable, 'length')).toEqual({
+      configurable: true,
+      enumerable: false,
+      value: 1,
+      writable: false,
+    })
   })
 
   it('passes the invocation receiver to call', () => {
