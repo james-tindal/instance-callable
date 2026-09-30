@@ -125,12 +125,14 @@ describe('Callable', () => {
     expect(counter).toBeInstanceOf(Counter)
   })
 
-  it('retains native function metadata', () => {
+  it('uses the subclass name and callable arity as function metadata', () => {
     const counter = new Counter()
+    const derivedCounter = new DerivedCounter()
 
-    expect(counter.name).toBe('anonymous')
-    expect(counter.length).toBe(0)
-    expect(counter).toHaveProperty('prototype')
+    expect(counter.name).toBe('Counter')
+    expect(counter.length).toBe(1)
+    expect(derivedCounter.name).toBe('DerivedCounter')
+    expect(derivedCounter.length).toBe(1)
   })
 
   it('passes the invocation receiver to call', () => {
