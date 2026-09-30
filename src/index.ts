@@ -8,7 +8,7 @@ export abstract class Callable<Arguments extends unknown[], Result> extends Func
   constructor() {
     super()
 
-    const callable = function(this: unknown, ...argumentsList: Arguments) {
+    const callable = function(this: unknown, ...argumentsList: Arguments): Result {
       return callable.call(this, ...argumentsList)
     }
     Object.setPrototypeOf(callable, new.target.prototype)
