@@ -1,0 +1,51 @@
+{
+  "name": "extend-callable",
+  "version": "0.1.0",
+  "description": "Create classes whose instances are callable",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/james-tindal/extend-callable.git"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "license": "0BSD",
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "lint": "vp lint",
+    "prepack": "vp pack",
+    "test": "vp test",
+    "typecheck": "vp check --no-fmt --no-lint"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint-plugin-perfectionist": "^5.12.0",
+    "typescript": "^7.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.5.1",
+      "onFail": "download"
+    }
+  }
+}
