@@ -41,9 +41,12 @@ class InitialisedCallable extends Callable<[suffix: string], string> {
   }
 }
 
-class ReceiverCallable extends Callable<[suffix: string], string> {
-  override call(thisArgument: { prefix: string }, suffix: string) {
-    return `${thisArgument.prefix}:${suffix}`
+class ReceiverCallable extends Callable<[amount: number], number> {
+  value = 0
+
+  override call(thisArgument: this, amount: number) {
+    thisArgument.value += amount
+    return thisArgument.value
   }
 }
 
@@ -57,8 +60,11 @@ describe('Callable', () => {
 
   it('supports explicit Function.call invocation', () => {
     const callable = new ReceiverCallable()
+    const receiver = new ReceiverCallable()
 
-    expect(callable.call({ prefix: 'value' }, 'suffix')).toBe('value:suffix')
+    expect(callable.call(receiver, 2)).toBe(2)
+    expect(callable.value).toBe(0)
+    expect(receiver.value).toBe(2)
   })
 
   it('preserves subclass state, methods, and accessors', () => {
@@ -88,15 +94,21 @@ describe('Callable', () => {
 
   it('supports Function.apply', () => {
     const callable = new ReceiverCallable()
+    const receiver = new ReceiverCallable()
 
-    expect(callable.apply({ prefix: 'apply' }, ['value'])).toBe('apply:value')
+    expect(callable.apply(receiver, [3])).toBe(3)
+    expect(callable.value).toBe(0)
+    expect(receiver.value).toBe(3)
   })
 
   it('supports Function.bind', () => {
     const callable = new ReceiverCallable()
-    const bound = callable.bind({ prefix: 'bound' })
+    const receiver = new ReceiverCallable()
+    const bound = callable.bind(receiver)
 
-    expect(bound('value')).toBe('bound:value')
+    expect(bound(4)).toBe(4)
+    expect(callable.value).toBe(0)
+    expect(receiver.value).toBe(4)
   })
 
   it('preserves constructor arguments and initialized fields', () => {
@@ -137,9 +149,11 @@ describe('Callable', () => {
 
   it('passes the invocation receiver to call', () => {
     const callable = new ReceiverCallable()
+    const receiver = new ReceiverCallable()
 
-    expect(Reflect.apply(callable, { prefix: 'receiver' }, ['value']))
-      .toBe('receiver:value')
+    expect(Reflect.apply(callable, receiver, [5])).toBe(5)
+    expect(callable.value).toBe(0)
+    expect(receiver.value).toBe(5)
   })
 
   it('retains ordinary subclass methods', () => {
@@ -155,14 +169,14 @@ void function verifyTypes(): void {
 
   expectTypeOf(counter).toBeCallableWith(1)
   expectTypeOf(counter(1)).toEqualTypeOf<number>()
-  expectTypeOf(receiver.call({ prefix: 'value' }, 'suffix')).toEqualTypeOf<string>()
-  expectTypeOf(receiver.apply({ prefix: 'value' }, ['suffix'])).toEqualTypeOf<string>()
-  expectTypeOf(receiver.bind({ prefix: 'value' })).toEqualTypeOf<(suffix: string) => string>()
+  expectTypeOf(receiver.call(receiver, 1)).toEqualTypeOf<number>()
+  expectTypeOf(receiver.apply(receiver, [1])).toEqualTypeOf<number>()
+  expectTypeOf(receiver.bind(receiver)).toEqualTypeOf<(amount: number) => number>()
   expectTypeOf(new AsyncCallable()(1)).toEqualTypeOf<Promise<number>>()
 
   // @ts-expect-error The callable requires a number argument.
   counter('1')
 
-  // @ts-expect-error The explicit receiver requires a prefix.
-  receiver.call({}, 'suffix')
+  // @ts-expect-error The explicit receiver must be a ReceiverCallable.
+  receiver.call({}, 1)
 }
