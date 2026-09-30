@@ -1,7 +1,7 @@
 export interface Callable<Arguments extends unknown[], Result> {
   (...argumentsList: Arguments): Result
-  apply(thisArgument: unknown, argumentsList: Arguments): Result
-  bind(thisArgument: unknown): (...argumentsList: Arguments) => Result
+  apply(thisArgument: this, argumentsList: Arguments): Result
+  bind(thisArgument: this): (...argumentsList: Arguments) => Result
 }
 
 export abstract class Callable<Arguments extends unknown[], Result> extends Function {
@@ -22,5 +22,5 @@ export abstract class Callable<Arguments extends unknown[], Result> extends Func
     return callable
   }
 
-  abstract override call(thisArgument: unknown, ...argumentsList: Arguments): Result
+  abstract override call(thisArgument: this, ...argumentsList: Arguments): Result
 }
