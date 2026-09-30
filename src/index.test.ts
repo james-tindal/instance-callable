@@ -2,6 +2,12 @@ import { describe, expect, expectTypeOf, it } from 'vite-plus/test'
 
 import { Callable } from '.'
 
+class AsyncCallable extends Callable<[value: number], Promise<number>> {
+  async call(_thisArgument: unknown, value: number) {
+    return value * 2
+  }
+}
+
 class Counter extends Callable<[amount: number], number> {
   value = 0
 
@@ -15,9 +21,9 @@ class Counter extends Callable<[amount: number], number> {
   }
 }
 
-class ReceiverCallable extends Callable<[suffix: string], string> {
-  override call(thisArgument: { prefix: string }, suffix: string) {
-    return `${thisArgument.prefix}:${suffix}`
+class DerivedCounter extends Counter {
+  decrement(amount: number) {
+    return this(-amount)
   }
 }
 
@@ -26,24 +32,18 @@ class InitialisedCallable extends Callable<[suffix: string], string> {
     super()
   }
 
-  describe() {
-    return `callable:${this.prefix}`
-  }
-
   override call(_thisArgument: unknown, suffix: string) {
     return `${this.prefix}:${suffix}`
   }
-}
 
-class AsyncCallable extends Callable<[value: number], Promise<number>> {
-  async call(_thisArgument: unknown, value: number) {
-    return value * 2
+  describe() {
+    return `callable:${this.prefix}`
   }
 }
 
-class DerivedCounter extends Counter {
-  decrement(amount: number) {
-    return this(-amount)
+class ReceiverCallable extends Callable<[suffix: string], string> {
+  override call(thisArgument: { prefix: string }, suffix: string) {
+    return `${thisArgument.prefix}:${suffix}`
   }
 }
 
