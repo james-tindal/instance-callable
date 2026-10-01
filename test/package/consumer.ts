@@ -1,4 +1,4 @@
-import { call, Callable } from 'extend-callable'
+import { call, Callable } from 'instance-callable'
 
 class Add extends Callable<[left: number, right: number], number> {
   override [call](left: number, right: number) {

@@ -1,4 +1,4 @@
-export const call = Symbol('extend-callable.call')
+export const call = Symbol('instance-callable.call')
 
 export interface Callable<Arguments extends unknown[], Result> {
   (...argumentsList: Arguments): Result

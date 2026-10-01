@@ -1,10 +1,10 @@
 {
-  "name": "extend-callable",
+  "name": "instance-callable",
   "version": "0.1.0",
   "description": "Create classes whose instances are callable",
   "repository": {
     "type": "git",
-    "url": "https://github.com/james-tindal/extend-callable.git"
+    "url": "https://github.com/james-tindal/instance-callable.git"
   },
   "type": "module",
   "exports": {

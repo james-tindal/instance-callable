@@ -9,7 +9,7 @@ const fixtureSource = resolve(packageRoot, 'test/package')
 const packageJson = JSON.parse(
   readFileSync(resolve(packageRoot, 'package.json'), 'utf8'),
 ) as { name: string, version: string }
-const testDirectory = mkdtempSync(join(tmpdir(), 'extend-callable-'))
+const testDirectory = mkdtempSync(join(tmpdir(), 'instance-callable-'))
 const fixtureRoot = resolve(testDirectory, 'package')
 const tarball = resolve(
   testDirectory,

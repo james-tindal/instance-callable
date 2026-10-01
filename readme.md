@@ -1,11 +1,11 @@
-# extend-callable
+# instance-callable
 
 Create classes whose instances are **callable**.
 
 ## Install
 
 ```sh
-pnpm add extend-callable
+pnpm add instance-callable
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ pnpm add extend-callable
 Extend `Callable` and override `[call]`.
 
 ```ts
-import { call, Callable } from 'extend-callable'
+import { call, Callable } from 'instance-callable'
 
 class Counter extends Callable<[amount: number], number> {
   value = 0
