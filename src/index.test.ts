@@ -105,6 +105,24 @@ describe('Callable', () => {
     expect(receiver.value).toBe(2)
   })
 
+  it('requires call implementations to use thisArgument for an explicit receiver', () => {
+    class IncorrectReceiverCallable extends Callable<[amount: number], number> {
+      value = 0
+
+      override call(_thisArgument: this, amount: number) {
+        this.value += amount
+        return this.value
+      }
+    }
+
+    const callable = new IncorrectReceiverCallable()
+    const receiver = new IncorrectReceiverCallable()
+
+    expect(callable.call(receiver, 2)).toBe(2)
+    expect(callable.value).toBe(2)
+    expect(receiver.value).toBe(0)
+  })
+
   it('preserves subclass state, methods, and accessors', () => {
     const counter = new Counter()
 
