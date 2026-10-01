@@ -1,6 +1,6 @@
 # extend-callable
 
-Create strongly typed callable class instances.
+Create classes whose instances are **callable**.
 
 ## Install
 
@@ -10,8 +10,7 @@ pnpm add extend-callable
 
 ## Usage
 
-Extend `Callable` with the argument tuple and return type. Implement a
-`Function.call`-compatible method.
+Extend `Callable` and override `call`
 
 ```ts
 import { Callable } from 'extend-callable'
@@ -19,7 +18,7 @@ import { Callable } from 'extend-callable'
 class Counter extends Callable<[amount: number], number> {
   value = 0
 
-  override call(_thisArgument: unknown, amount: number) {
+  override call(thisArg: this, amount: number) {
     this.value += amount
     return this.value
   }
