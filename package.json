@@ -1,6 +1,6 @@
 {
   "name": "instance-callable",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Create classes whose instances are callable",
   "repository": {
     "type": "git",
