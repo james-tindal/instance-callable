@@ -1,9 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vite-plus/test'
 
-import { Callable } from '.'
+import { call, Callable } from '.'
 
 class AsyncCallable extends Callable<[value: number], Promise<number>> {
-  async call(_thisArgument: unknown, value: number) {
+  override async [call](value: number) {
     return value * 2
   }
 }
@@ -15,7 +15,7 @@ class Counter extends Callable<[amount: number], number> {
     return this.value * 2
   }
 
-  override call(_thisArgument: unknown, amount: number) {
+  override [call](amount: number) {
     this.value += amount
     return this.value
   }
@@ -32,7 +32,7 @@ class InitialisedCallable extends Callable<[suffix: string], string> {
     super()
   }
 
-  override call(_thisArgument: unknown, suffix: string) {
+  override [call](suffix: string) {
     return `${this.prefix}:${suffix}`
   }
 
@@ -46,7 +46,7 @@ class MultipleArgumentsCallable extends Callable<[
   second: number,
   third: number,
 ], number> {
-  override call(_thisArgument: unknown, first: number, second: number, third: number) {
+  override [call](first: number, second: number, third: number) {
     return first + second + third
   }
 }
@@ -56,8 +56,7 @@ class OptionalAndRestCallable extends Callable<[
   optional?: string,
   ...rest: string[],
 ], string> {
-  override call(
-    _thisArgument: unknown,
+  override [call](
     required: string,
     optional?: string,
     ...rest: string[]
@@ -67,7 +66,7 @@ class OptionalAndRestCallable extends Callable<[
 }
 
 class OverriddenCounter extends Counter {
-  override call(_thisArgument: unknown, amount: number, multiplier = 1) {
+  override [call](amount: number, multiplier = 1) {
     this.value += amount * multiplier
     return this.value
   }
@@ -76,14 +75,14 @@ class OverriddenCounter extends Counter {
 class ReceiverCallable extends Callable<[amount: number], number> {
   value = 0
 
-  override call(thisArgument: this, amount: number) {
-    thisArgument.value += amount
-    return thisArgument.value
+  override [call](amount: number) {
+    this.value += amount
+    return this.value
   }
 }
 
 class ZeroArgumentsCallable extends Callable<[], string> {
-  override call() {
+  override [call]() {
     return 'zero'
   }
 }
@@ -103,24 +102,6 @@ describe('Callable', () => {
     expect(callable.call(receiver, 2)).toBe(2)
     expect(callable.value).toBe(0)
     expect(receiver.value).toBe(2)
-  })
-
-  it('requires call implementations to use thisArgument for an explicit receiver', () => {
-    class IncorrectReceiverCallable extends Callable<[amount: number], number> {
-      value = 0
-
-      override call(_thisArgument: this, amount: number) {
-        this.value += amount
-        return this.value
-      }
-    }
-
-    const callable = new IncorrectReceiverCallable()
-    const receiver = new IncorrectReceiverCallable()
-
-    expect(callable.call(receiver, 2)).toBe(2)
-    expect(callable.value).toBe(2)
-    expect(receiver.value).toBe(0)
   })
 
   it('preserves subclass state, methods, and accessors', () => {
@@ -208,7 +189,7 @@ describe('Callable', () => {
     expect(new MultipleArgumentsCallable().length).toBe(3)
   })
 
-  it('uses inherited and overridden call implementations for metadata', () => {
+  it('uses inherited and overridden implementations for metadata', () => {
     expect(new DerivedCounter().length).toBe(1)
     expect(new OverriddenCounter().length).toBe(1)
     expect(new OverriddenCounter().name).toBe('OverriddenCounter')
@@ -238,7 +219,7 @@ describe('Callable', () => {
     })
   })
 
-  it('passes the invocation receiver to call', () => {
+  it('passes the invocation receiver to the implementation', () => {
     const callable = new ReceiverCallable()
     const receiver = new ReceiverCallable()
 

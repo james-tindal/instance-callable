@@ -1,26 +1,33 @@
+export const call = Symbol('extend-callable.call')
+
 export interface Callable<Arguments extends unknown[], Result> {
   (...argumentsList: Arguments): Result
   apply(thisArgument: this, argumentsList: Arguments): Result
   bind(thisArgument: this): (...argumentsList: Arguments) => Result
+  call(thisArgument: this, ...argumentsList: Arguments): Result
 }
 
 export abstract class Callable<Arguments extends unknown[], Result> extends Function {
   constructor() {
     super()
 
-    const callable = function(this: unknown, ...argumentsList: Arguments): Result {
-      return callable.call(this, ...argumentsList)
+    const callable = function(
+      this: Callable<Arguments, Result> | undefined,
+      ...argumentsList: Arguments
+    ): Result {
+      return callableInstance[call].apply(this ?? callableInstance, argumentsList)
     }
+    const callableInstance = callable as Callable<Arguments, Result>
     Object.setPrototypeOf(callable, new.target.prototype)
 
-    const implementation = new.target.prototype.call as Function
+    const implementation = new.target.prototype[call] as Function
     Object.defineProperties(callable, {
-      length: { value: Math.max(0, implementation.length - 1) },
+      length: { value: implementation.length },
       name: { value: new.target.name },
     })
 
-    return callable
+    return callableInstance
   }
 
-  abstract override call(thisArgument: this, ...argumentsList: Arguments): Result
+  protected abstract [call](...argumentsList: Arguments): Result
 }
